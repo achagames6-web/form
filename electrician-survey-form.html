@@ -1,0 +1,2674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mashworth Services — Job Intake Form</title>
+  <!-- Flatpickr date picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr" onerror="window.flatpickr=function(){return{clear:function(){},destroy:function(){}}};"></script>
+  <style>
+    /* ============================================================
+       BRAND TOKENS
+    ============================================================ */
+    :root {
+      --navy  : #063362;
+      --navy2 : #042a54;
+      --navy3 : #063362;
+      --orange: #e8401c;
+      --orng2 : #c73516;
+      --white : #ffffff;
+      --border: rgba(232,64,28,0.40);
+      --radius: 10px;
+      --step-dot: 34px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #063362;
+      color: var(--white);
+      min-height: 100vh;
+      padding: 16px 10px 60px;
+    }
+
+    /* ============================================================
+       OUTER SHELL
+    ============================================================ */
+    .form-shell {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--navy3);
+      border-radius: 18px;
+      border: 1.5px solid rgba(232,64,28,0.20);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.40);
+    }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+    .form-header {
+      background: var(--navy2);
+      padding: 26px 32px 22px;
+      border-bottom: 2px solid var(--orange);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .form-header img.logo {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+    }
+    .form-header p {
+      font-size: 0.80rem;
+      color: rgba(255,255,255,0.48);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       STEP PROGRESS BAR
+    ============================================================ */
+    .step-progress {
+      background: var(--navy2);
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* Track labels row */
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .step-label {
+      font-size: 0.60rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: rgba(255,255,255,0.30);
+      text-align: center;
+      flex: 1;
+      transition: color 0.3s;
+    }
+    .step-label.active  { color: var(--orange); }
+    .step-label.done    { color: rgba(255,255,255,0.55); }
+
+    /* Dot + line track */
+    .step-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .step-dot {
+      width: var(--step-dot);
+      height: var(--step-dot);
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.18);
+      background: var(--navy2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      flex-shrink: 0;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+    .step-dot.active {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(232,64,28,0.22);
+    }
+    .step-dot.done {
+      border-color: rgba(232,64,28,0.6);
+      background: rgba(232,64,28,0.18);
+      color: var(--orange);
+    }
+    .step-dot.done::after {
+      content: "✓";
+      position: absolute;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .step-dot.done span { display: none; }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.10);
+      position: relative;
+    }
+    .step-line .fill {
+      height: 100%;
+      background: var(--orange);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ============================================================
+       STEP COUNTER TEXT
+    ============================================================ */
+    .step-counter {
+      padding: 18px 32px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .step-counter .current {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--orange);
+    }
+    .step-counter .total {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.38);
+    }
+    .step-counter .step-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-left: 6px;
+    }
+
+    /* ============================================================
+       STEPS CONTAINER
+    ============================================================ */
+    .steps-wrap {
+      padding: 24px 32px 20px;
+    }
+
+    .step-panel {
+      display: none;
+      animation: fadeIn 0.22s ease;
+    }
+    .step-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       FIELD GROUPS
+    ============================================================ */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 18px;
+    }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    label {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--orange);
+      margin-bottom: 7px;
+      letter-spacing: 0.15px;
+    }
+    label .req { color: #ff6b47; margin-left: 3px; }
+    label .hint {
+      display: block;
+      font-weight: 400;
+      color: rgba(255,255,255,0.38);
+      font-size: 0.73rem;
+      margin-top: 2px;
+      letter-spacing: 0;
+    }
+
+    /* ============================================================
+       INPUTS
+    ============================================================ */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 15px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.92rem;
+      color: #1a1a2e;
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: #9aa5b8; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232,64,28,0.16);
+    }
+    input.error, select.error, textarea.error {
+      border-color: #e53e3e;
+      box-shadow: 0 0 0 3px rgba(229,62,62,0.12);
+    }
+    input[type="date"] { color: #1a1a2e; }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8401c' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 12px;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+    textarea { resize: vertical; min-height: 100px; line-height: 1.55; }
+
+    /* Flatpickr calendar theming */
+    .flatpickr-calendar {
+      background: #0d2147 !important;
+      border: 1.5px solid rgba(232,64,28,0.40) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45) !important;
+      font-family: 'Segoe UI', Arial, sans-serif !important;
+    }
+    .flatpickr-months .flatpickr-month,
+    .flatpickr-weekdays,
+    span.flatpickr-weekday {
+      background: #091730 !important;
+      color: rgba(255,255,255,0.60) !important;
+      font-weight: 700 !important;
+      font-size: 0.78rem !important;
+    }
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+      fill: #e8401c !important;
+    }
+    .flatpickr-months .flatpickr-prev-month:hover svg,
+    .flatpickr-months .flatpickr-next-month:hover svg { fill: #fff !important; }
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year {
+      color: #fff !important;
+      font-weight: 700 !important;
+      background: transparent !important;
+    }
+    .flatpickr-day {
+      color: rgba(255,255,255,0.75) !important;
+      border-radius: 8px !important;
+    }
+    .flatpickr-day:hover {
+      background: rgba(232,64,28,0.22) !important;
+      border-color: transparent !important;
+      color: #fff !important;
+    }
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+      background: #e8401c !important;
+      border-color: #e8401c !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+    }
+    .flatpickr-day.today { border-color: rgba(232,64,28,0.55) !important; color: #e8401c !important; font-weight:700;}
+    .flatpickr-day.today.selected { color: #fff !important; }
+    .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover {
+      color: rgba(255,255,255,0.18) !important;
+    }
+    /* Hide the native date input calendar icon -- flatpickr handles it */
+    input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; }
+
+    /* ============================================================
+       PHONE WITH UK PREFIX
+    ============================================================ */
+    .phone-wrap {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .phone-prefix {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-right: none;
+      border-radius: var(--radius) 0 0 var(--radius);
+      font-size: 0.91rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      white-space: nowrap;
+      flex-shrink: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      line-height: 1;
+    }
+    .phone-prefix img.flag-img {
+      display: block;
+      width: 20px;
+      height: 14px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .phone-prefix .dial-code {
+      font-size: 0.91rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      line-height: 1;
+    }
+    .phone-wrap input[type="tel"] {
+      border-radius: 0 var(--radius) var(--radius) 0 !important;
+      flex: 1;
+      min-width: 0;
+    }
+    .phone-wrap input[type="tel"]:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232,64,28,0.16);
+      z-index: 1;
+      position: relative;
+    }
+    .phone-wrap input.error { border-color: #e53e3e; }
+
+    /* ============================================================
+       CUSTOM MULTI-SELECT DROPDOWN
+    ============================================================ */
+    .ms-wrap {
+      position: relative;
+    }
+    .ms-trigger {
+      width: 100%;
+      min-height: 46px;
+      padding: 8px 38px 8px 14px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .ms-trigger:hover { border-color: var(--orange); }
+    .ms-trigger.open {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232,64,28,0.16);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .ms-trigger::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #e8401c;
+      transition: transform 0.2s;
+      pointer-events: none;
+    }
+    .ms-trigger.open::after { transform: translateY(-50%) rotate(180deg); }
+    .ms-placeholder {
+      color: #9aa5b8;
+      font-size: 0.91rem;
+      line-height: 1;
+    }
+    /* Tag pill for selected items */
+    .ms-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #e8401c;
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 9px 3px 10px;
+      border-radius: 20px;
+      line-height: 1.2;
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .ms-tag-x {
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      opacity: 0.80;
+      flex-shrink: 0;
+    }
+    .ms-tag-x:hover { opacity: 1; }
+    /* Dropdown panel */
+    .ms-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      background: #fff;
+      border: 1.5px solid var(--orange);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+    }
+    .ms-wrap.open .ms-dropdown { display: block; }
+    .ms-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      color: #1a1a2e;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: background 0.15s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .ms-option:last-child { border-bottom: none; }
+    .ms-option:hover { background: rgba(232,64,28,0.08); }
+    .ms-option.selected { background: rgba(232,64,28,0.11); font-weight: 700; color: #c73516; }
+    .ms-option input[type="checkbox"] {
+      width: 16px; height: 16px; min-width: 16px;
+      accent-color: #e8401c;
+      pointer-events: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    /* Sub-section header inside dropdown */
+    .ms-section-header {
+      padding: 8px 14px 4px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #e8401c;
+      background: rgba(232,64,28,0.05);
+      border-bottom: 1px solid rgba(232,64,28,0.15);
+      cursor: default;
+    }
+
+    /* ============================================================
+       CATEGORY MULTI-SELECT GRID
+    ============================================================ */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    @media (max-width: 500px) { .cat-grid { grid-template-columns: 1fr; } }
+
+    .cat-card {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 13px;
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: border-color 0.17s, background 0.17s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .cat-card:hover { border-color: var(--orange); background: rgba(232,64,28,0.08); }
+    .cat-card input[type="checkbox"] {
+      width: 16px; height: 16px; min-width: 16px;
+      accent-color: var(--orange);
+      cursor: pointer;
+      border: none !important; background: none !important;
+      box-shadow: none !important; padding: 0 !important;
+    }
+    .cat-card-label { font-size: 0.83rem; color: rgba(255,255,255,0.72); font-weight: 500; line-height: 1.25; }
+    .cat-card.checked { border-color: var(--orange); background: rgba(232,64,28,0.14); }
+    .cat-card.checked .cat-card-label { color: #fff; font-weight: 700; }
+
+    /* Sub-options groups within step 4 — shown when parent category is checked */
+    .sub-block {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 16px 12px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(232,64,28,0.18);
+      border-radius: 10px;
+      animation: fadeIn 0.2s ease;
+    }
+    .sub-block.visible { display: block; }
+    .sub-block-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 10px;
+    }
+
+    /* File input */
+    input[type="file"] {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.5px dashed rgba(232,64,28,0.45);
+      border-radius: var(--radius);
+      font-size: 0.84rem;
+      color: var(--white);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+    }
+    input[type="file"]:hover { border-color: var(--orange); }
+    input[type="file"]::-webkit-file-upload-button {
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    input[type="file"]::file-selector-button {
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    /* Error messages */
+    .error-msg {
+      display: none;
+      font-size: 0.76rem;
+      color: #ff6b6b;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ============================================================
+       CHECKBOX MULTI-SELECT CARDS
+    ============================================================ */
+    .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+
+    .cb-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: border-color 0.17s, background 0.17s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .cb-card:hover { border-color: var(--orange); background: rgba(232,64,28,0.07); }
+    .cb-card input[type="checkbox"] {
+      width: 18px; height: 18px; min-width: 18px;
+      accent-color: var(--orange);
+      cursor: pointer;
+      border: none !important;
+      background: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    .cb-label { font-size: 0.88rem; color: rgba(255,255,255,0.80); font-weight: 500; line-height: 1.3; }
+    .cb-card.checked { border-color: var(--orange); background: rgba(232,64,28,0.13); }
+    .cb-card.checked .cb-label { color: #fff; font-weight: 600; }
+
+    /* Category placeholder */
+    #conditional-placeholder {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.33);
+      font-style: italic;
+      padding: 4px 0 8px;
+    }
+
+    /* Conditional block */
+    .conditional-block { display: none; animation: fadeIn 0.22s ease; }
+    .conditional-block.visible { display: block; }
+
+    /* EV notes */
+    #ev-notes-block { display: none; }
+    #ev-notes-block.visible { display: block; }
+
+    /* ============================================================
+       MATERIALS TABLE
+    ============================================================ */
+    .materials-intro {
+      font-size: 0.81rem;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .material-table { width: 100%; border-collapse: collapse; }
+    .material-table thead th {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--orange);
+      padding: 8px 12px;
+      background: rgba(232,64,28,0.09);
+      border-bottom: 1px solid rgba(232,64,28,0.22);
+      text-align: left;
+    }
+    .material-table thead th:last-child { text-align: center; width: 110px; }
+    .material-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .material-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+    .material-table td { padding: 9px 12px; font-size: 0.86rem; color: rgba(255,255,255,0.78); vertical-align: middle; }
+    .material-table td:last-child { text-align: center; }
+
+    .qty-input {
+      width: 70px !important;
+      padding: 6px 8px !important;
+      font-size: 0.9rem !important;
+      text-align: center;
+      border: 1.5px solid rgba(232,64,28,0.38) !important;
+      border-radius: 6px;
+      color: #1a1a2e;
+      background: var(--white) !important;
+      font-weight: 700;
+      box-shadow: none !important;
+    }
+    .qty-input:focus { border-color: var(--orange) !important; box-shadow: 0 0 0 2px rgba(232,64,28,0.14) !important; }
+    .unit-badge { font-size: 0.71rem; color: rgba(255,255,255,0.40); margin-left: 4px; }
+
+    #no-materials-msg { font-size: 0.83rem; color: rgba(255,255,255,0.33); font-style: italic; display: none; }
+
+    /* ============================================================
+       NAVIGATION BUTTONS
+    ============================================================ */
+    .nav-row {
+      display: flex;
+      gap: 12px;
+      padding: 18px 32px 28px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .btn-back {
+      flex: 0 0 auto;
+      padding: 13px 26px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: var(--radius);
+      color: rgba(255,255,255,0.65);
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-back:hover { border-color: rgba(255,255,255,0.40); color: #fff; }
+    .btn-back:disabled { opacity: 0.25; cursor: not-allowed; }
+
+    .btn-next {
+      flex: 1;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--orange), var(--orng2));
+      color: var(--white);
+      font-size: 0.97rem;
+      font-weight: 800;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      transition: opacity 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(232,64,28,0.38);
+    }
+    .btn-next:hover { opacity: 0.91; box-shadow: 0 6px 22px rgba(232,64,28,0.50); }
+    .btn-next:active { transform: scale(0.99); }
+    .btn-next:disabled { opacity: 0.40; cursor: not-allowed; box-shadow: none; }
+
+    /* ============================================================
+       BANNERS
+    ============================================================ */
+    #form-banner {
+      display: none;
+      margin: 0 32px 16px;
+      padding: 13px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    #form-banner.success { background: rgba(72,187,120,0.13); color: #9ae6b4; border: 1px solid rgba(72,187,120,0.30); }
+    #form-banner.error-banner { background: rgba(229,62,62,0.11); color: #feb2b2; border: 1px solid rgba(229,62,62,0.26); }
+
+    /* ============================================================
+       SUCCESS SCREEN
+    ============================================================ */
+    #success-screen {
+      display: none;
+      text-align: center;
+      padding: 48px 32px 56px;
+    }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: rgba(72,187,120,0.14);
+      border: 2px solid rgba(72,187,120,0.45);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+    #success-screen h2 { font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    #success-screen p { font-size: 0.88rem; color: rgba(255,255,255,0.50); line-height: 1.6; }
+    .btn-restart {
+      margin-top: 26px;
+      padding: 12px 32px;
+      background: var(--orange);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+    .btn-restart:hover { opacity: 0.88; }
+
+    /* ============================================================
+       FILE NOTE
+    ============================================================ */
+    .file-note { font-size: 0.72rem; color: rgba(255,255,255,0.28); margin-top: 6px; font-style: italic; }
+    .sub-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 16px 0 14px; }
+    #sub-dropdowns-container .field-group { margin-top: 16px; }
+
+    /* ── Category sub-page: only the active page is shown ── */
+    .cat-page { display: none; }
+    .cat-page.active { display: block; }
+
+    /* ── Category sub-page navigation bar ── */
+    #cat-page-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(232,64,28,0.22);
+      border-radius: var(--radius);
+    }
+    #cat-page-nav .cat-nav-counter {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      flex: 1;
+      line-height: 1.4;
+    }
+    #cat-page-nav .cat-nav-counter strong {
+      display: block;
+      font-size: 0.96rem;
+      color: #fff;
+      font-weight: 700;
+    }
+    .btn-cat-nav {
+      background: var(--navy2);
+      border: 1.5px solid rgba(232,64,28,0.45);
+      color: var(--white);
+      padding: 7px 18px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn-cat-nav:hover:not(:disabled) { background: var(--orange); border-color: var(--orange); }
+    .btn-cat-nav:disabled { opacity: 0.32; cursor: default; }
+
+    /* ── Editable qty input inside inline materials panel ── */
+    .mat-qty-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 140px;
+    }
+    .mat-qty-inp {
+      width: 54px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(232,64,28,0.4);
+      color: #fff;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      padding: 3px 6px;
+      text-align: center;
+    }
+    .mat-qty-inp:focus { outline: none; border-color: var(--orange); }
+    .mat-unit-badge {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.45);
+    }
+    .mat-group ul li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none !important;
+      border: none !important;
+      padding: 3px 0 !important;
+      border-radius: 0 !important;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.85);
+    }
+    .mat-group ul { gap: 2px; flex-direction: column; }
+
+    /* Inline materials panel — shown below dropdown when options are selected */
+    .cat-mat-panel {
+      margin-top: 10px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: none;
+    }
+    .cat-mat-panel.visible { display: block; }
+    .mat-group {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.04);
+    }
+    .mat-group:last-child { border-bottom: none; }
+    .mat-opt-label {
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--orange); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .mat-group ul {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .mat-group ul li {
+      background: rgba(232,64,28,0.12);
+      border: 1px solid rgba(232,64,28,0.3);
+      color: rgba(255,255,255,0.88);
+      font-size: 0.78rem; padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ============================================================
+       REVIEW STEP LAYOUT
+    ============================================================ */
+    .review-section {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(232,64,28,0.18);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .review-section-title {
+      background: rgba(232,64,28,0.15);
+      color: var(--orange);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(232,64,28,0.18);
+    }
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .review-cell {
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .review-cell:nth-child(odd)  { border-right: 1px solid rgba(255,255,255,0.05); }
+    .review-cell:last-child, .review-cell:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+    .review-cell-label {
+      font-size: 0.70rem;
+      color: rgba(255,255,255,0.42);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .review-cell-value {
+      font-size: 0.88rem;
+      color: #fff;
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .review-full-row {
+      grid-column: 1 / -1;
+    }
+    .review-tag-list {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px;
+    }
+    .review-tag {
+      background: rgba(232,64,28,0.15);
+      border: 1px solid rgba(232,64,28,0.35);
+      color: rgba(255,255,255,0.88);
+      font-size: 0.73rem;
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+    .review-mat-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.82rem; margin-top: 4px;
+    }
+    .review-mat-table th {
+      text-align: left; color: rgba(255,255,255,0.42);
+      font-size: 0.70rem; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 4px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .review-mat-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.88);
+    }
+    .review-mat-table tr:last-child td { border-bottom: none; }
+    .review-mat-table td:nth-child(2) { text-align: center; font-weight: 600; color: var(--orange); }
+    .btn-download-pdf {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid rgba(232,64,28,0.50);
+      color: var(--white);
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-download-pdf:hover { background: rgba(232,64,28,0.15); border-color: var(--orange); }
+    .review-notes-text {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.80);
+      white-space: pre-wrap;
+      line-height: 1.55;
+      padding: 10px 14px;
+    }
+    /* ============================================================
+       ELITE CONNECTOR FOOTER
+    ============================================================ */
+    .ec-footer {
+      text-align: center;
+      padding: 18px 20px 24px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin-top: 4px;
+    }
+    .ec-footer a { display: inline-block; line-height: 0; }
+    .ec-footer .powered-by-text {
+      font-size: 0.70rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 0px;
+      margin-bottom: 0;
+    }
+    .ec-footer img {
+      height: 88px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.70;
+      transition: opacity 0.2s;
+    }
+    .ec-footer img:hover { opacity: 1; }
+    @media print { .ec-footer { display: none !important; } }
+
+    /* ── Print styles for PDF download ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; padding: 0; }
+      .form-shell { border: none !important; box-shadow: none !important; max-width: 100%; background: #fff !important; }
+      #step-progress, #step-counter, .nav-row, .btn-download-pdf,
+      #form-banner, #success-screen, #btn-back, #btn-next { display: none !important; }
+      .step-panel { display: none !important; }
+      #step-7 { display: block !important; }
+      .review-section { border: 1px solid #ccc !important; background: #fafafa !important; margin-bottom: 12px; }
+      .review-section-title { background: #f0f0f0 !important; color: #000 !important; }
+      .review-cell { border-color: #ddd !important; }
+      .review-cell-label { color: #666 !important; }
+      .review-cell-value { color: #000 !important; }
+      .review-tag { background: #eee !important; border-color: #ccc !important; color: #000 !important; }
+      .review-mat-table th { color: #666 !important; border-color: #ccc !important; }
+      .review-mat-table td { color: #000 !important; border-color: #ddd !important; }
+      .review-mat-table td:nth-child(2) { color: #c73516 !important; }
+      .review-notes-text { color: #000 !important; }
+      .form-header { border-bottom: 2px solid #c73516 !important; }
+      .form-header h1, .form-header p { color: #000 !important; }
+    }
+
+    /* ============================================================
+       APPLE / iOS SAFARI FIXES
+    ============================================================ */
+    /* Prevent iOS Safari auto-zoom on input focus (inputs < 16px trigger zoom) */
+    @supports (-webkit-touch-callout: none) {
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="date"],
+      select,
+      textarea { font-size: 16px !important; }
+    }
+    /* Remove iOS tap highlight flash on buttons and interactive elements */
+    button, a, label, .cat-card, .cb-card, .ms-trigger, .ms-option {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    /* Prevent iOS bounce/overscroll from breaking layout */
+    .ms-dropdown { -webkit-overflow-scrolling: touch; }
+    /* Ensure border-radius respected on iOS inputs */
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="date"], select, textarea {
+      -webkit-border-radius: var(--radius);
+    }
+    /* Fix select arrow visibility on iOS */
+    select { background-clip: padding-box; }
+    /* Logo fallback text — shown if image fails to load */
+    .logo-fallback-text {
+      display: none;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: 0.5px;
+    }
+    .ec-logo-fallback-text {
+      display: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 600px) {
+      body { padding: 0 0 48px; }
+      .form-shell { border-radius: 0; border-left: none; border-right: none; }
+      .row-2 { grid-template-columns: 1fr; }
+      .steps-wrap { padding: 18px 14px 14px; }
+      .nav-row { padding: 14px 14px 22px; gap: 10px; }
+      .step-progress { padding: 14px 14px 12px; }
+      .form-header { padding: 18px 14px 16px; }
+      .form-header img.logo { height: 44px; }
+      #form-banner { margin: 0 14px 12px; }
+      .step-labels { display: none; }
+      .step-counter { padding: 14px 14px 0; }
+      .step-counter .current { font-size: 0.95rem; }
+      .step-counter .step-name { font-size: 0.82rem; }
+      .material-table td, .material-table thead th { padding: 7px 8px; font-size: 0.80rem; }
+      .qty-input { width: 58px !important; }
+      .cat-grid { grid-template-columns: 1fr; }
+      .btn-back { padding: 12px 18px; font-size: 0.86rem; }
+      .btn-next { font-size: 0.90rem; }
+      .ms-dropdown { max-height: 220px; }
+      .sub-block { padding: 12px 12px 10px; }
+    }
+    @media (max-width: 380px) {
+      .step-dot { --step-dot: 28px; font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-shell">
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+  <div class="form-header">
+    <img
+      class="logo"
+      src="https://storage.googleapis.com/highlevel-backend.appspot.com/location/BINHN67zcmmPlBACGLVK/form/hMuohaPigmvgQWiRptP0/91ddecbf-011d-4c99-8c80-a84f68039040.svg"
+      alt="Mashworth Services"
+      loading="eager"
+      decoding="async"
+      onerror="this.style.display='none';this.closest('.form-header').querySelector('.logo-fallback-text').style.display='block';"
+    />
+    <span class="logo-fallback-text">Mashworth Services</span>
+    <p>Complete all steps to submit your job intake. Required fields are marked *.</p>
+  </div>
+
+  <!-- ============================================================
+       STEP PROGRESS BAR
+  ============================================================ -->
+  <div class="step-progress" id="step-progress">
+    <!-- Step labels row (hidden on mobile) -->
+    <div class="step-labels" id="step-labels-row">
+      <!-- Injected by JS -->
+    </div>
+    <!-- Dot + line track -->
+    <div class="step-track" id="step-track-row">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <!-- Step counter heading -->
+  <div class="step-counter" id="step-counter">
+    <span class="current" id="sc-current">Step 1</span>
+    <span class="total" id="sc-total">of 7</span>
+    <span class="step-name" id="sc-name">Contact Details</span>
+  </div>
+
+  <!-- ============================================================
+       FORM
+  ============================================================ -->
+  <form id="survey-form" novalidate>
+    <div class="steps-wrap">
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 1 — CONTACT DETAILS
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel active" id="step-1">
+        <div class="row-2">
+          <div class="field-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" placeholder="First Name" />
+          </div>
+          <div class="field-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Last Name" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="phone">Phone <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <div class="phone-prefix">
+              <img class="flag-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3CclipPath id='a'%3E%3Cpath d='M0 0v30h60V0z'/%3E%3C/clipPath%3E%3CclipPath id='b'%3E%3Cpath d='M30 15h30v15zv15H0zH0V0zV0h30z'/%3E%3C/clipPath%3E%3Cg clip-path='url(%23a)'%3E%3Cpath d='M0 0v30h60V0z' fill='%23012169'/%3E%3Cpath d='M0 0l60 30m0-30L0 30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0 0l60 30m0-30L0 30' clip-path='url(%23b)' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30 0v30M0 15h60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30 0v30M0 15h60' stroke='%23C8102E' stroke-width='6'/%3E%3C/g%3E%3C/svg%3E" alt="UK" />
+              <span class="dial-code">UK +44</span>
+            </div>
+            <input type="tel" id="phone" name="phone" placeholder="7911 123456" />
+          </div>
+          <span class="error-msg" id="phone-err">Please enter a valid UK phone number.</span>
+        </div>
+        <div class="field-group">
+          <label for="email">Email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="Email" />
+          <span class="error-msg" id="email-err">Please enter a valid email address.</span>
+        </div>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 2 — SURVEY DETAILS
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel" id="step-2">
+        <div class="field-group">
+          <label for="survey_date">Survey Date <span class="req">*</span></label>
+          <input type="text" id="survey_date" name="survey_date" placeholder="Select a date…" readonly style="cursor:pointer;" />
+          <span class="error-msg" id="survey_date-err">Please select a survey date.</span>
+        </div>
+        <div class="field-group">
+          <label for="street_address">Street Address <span class="req">*</span></label>
+          <input type="text" id="street_address" name="street_address"
+            placeholder="e.g. 12 Baker Street"
+            autocomplete="street-address" />
+          <span class="error-msg" id="street_address-err">Please enter a street address.</span>
+        </div>
+        <div class="row-2">
+          <div class="field-group">
+            <label for="city">City <span class="req">*</span></label>
+            <input type="text" id="city" name="city" placeholder="e.g. London" />
+            <span class="error-msg" id="city-err">Please enter a city.</span>
+          </div>
+          <div class="field-group">
+            <label for="country">Country <span class="req">*</span></label>
+            <select id="country" name="country">
+              <option value="">— Select —</option>
+              <option value="UK">United Kingdom</option>
+              <option value="IE">Ireland</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+              <option value="AU">Australia</option>
+              <option value="NZ">New Zealand</option>
+              <option value="Other">Other</option>
+            </select>
+            <span class="error-msg" id="country-err">Please select a country.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 3 — PARKING
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel" id="step-3">
+        <div class="field-group">
+          <label for="parking_arrangement">Parking Arrangement <span class="req">*</span></label>
+          <select id="parking_arrangement" name="parking_arrangement">
+            <option value="">— Select —</option>
+            <option value="Driveway">Driveway</option>
+            <option value="Free On Road">Free On Road</option>
+            <option value="Pay for Parking">Pay for Parking</option>
+          </select>
+          <span class="error-msg" id="parking_arrangement-err">Please select a parking arrangement.</span>
+        </div>
+        <div class="field-group">
+          <label for="parking_picture">Upload Parking Picture
+            <span class="hint">Optional — photo of parking area or restrictions.</span>
+          </label>
+          <input type="file" id="parking_picture" name="parking_picture" accept="image/*,.pdf" />
+          <p class="file-note">⚠ File uploads — see GHL-Setup-Guide.md for hosting approach.</p>
+        </div>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 4 — JOB TYPE
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel" id="step-4">
+        <!-- Category sub-page navigation -->
+        <div id="cat-page-nav">
+          <button type="button" class="btn-cat-nav" id="btn-cat-prev">&#8592; Prev</button>
+          <div class="cat-nav-counter">
+            <strong id="cat-page-name"></strong>
+            <span id="cat-page-index"></span>
+          </div>
+          <button type="button" class="btn-cat-nav" id="btn-cat-next">Next &#8594;</button>
+        </div>
+
+        <!-- All category dropdowns built by JS on init (one .cat-page per category) -->
+        <div id="sub-dropdowns-container"></div>
+
+        <!-- EV notes — only when an EV Charging option is ticked -->
+        <div id="ev-notes-block" class="field-group">
+          <hr class="sub-divider" />
+          <label for="ev_notes">Load Management / CT Clamp / DNO Considerations
+            <span class="hint">Optional — EV charging specific notes.</span>
+          </label>
+          <textarea id="ev_notes" name="ev_notes" rows="3"
+            placeholder="e.g. CT clamp install required, DNO notification needed for 22kW..."></textarea>
+        </div>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 5 — MATERIALS REQUIRED
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel" id="step-5">
+        <p class="materials-intro">
+          Materials below are auto-filled from your job selections on the previous step.
+          Review and adjust quantities as needed.
+        </p>
+        <p id="no-materials-msg">No job types were selected — go back and tick at least one option.</p>
+        <table class="material-table" id="material-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Qty</th>
+            </tr>
+          </thead>
+          <tbody id="material-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 6 — NOTES + PHOTOS
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel" id="step-6">
+        <div class="row-2">
+          <div class="field-group">
+            <label for="photo_fuseboard">Fuse Board Make &amp; Model
+              <span class="hint">Optional photo.</span>
+            </label>
+            <input type="file" id="photo_fuseboard" accept="image/*" />
+          </div>
+          <div class="field-group">
+            <label for="photo_mains">Mains Incoming
+              <span class="hint">Optional photo.</span>
+            </label>
+            <input type="file" id="photo_mains" accept="image/*" />
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field-group">
+            <label for="photo_earth">Earth Bonding
+              <span class="hint">Optional photo.</span>
+            </label>
+            <input type="file" id="photo_earth" accept="image/*" />
+          </div>
+          <div class="field-group">
+            <label for="photo_other">Other Pictures
+              <span class="hint">Hold Ctrl/Cmd to select multiple.</span>
+            </label>
+            <input type="file" id="photo_other" accept="image/*" multiple />
+          </div>
+        </div>
+        <p class="file-note">⚠ File uploads — see GHL-Setup-Guide.md for hosting approach.</p>
+        <hr class="sub-divider" />
+        <div class="field-group">
+          <label for="job_notes">Job Notes
+            <span class="hint">Scope, access requirements, special considerations.</span>
+          </label>
+          <textarea id="job_notes" name="job_notes" rows="4"
+            placeholder="Enter any job-specific notes here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           STEP 7 — REVIEW &amp; SUBMIT
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div class="step-panel" id="step-7">
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.50);margin-bottom:14px;">Review all details below. Download a PDF copy, then click <strong>Submit Form</strong> to send to the team.</p>
+        <button type="button" class="btn-download-pdf" onclick="window.print()">
+          &#128438; Download as PDF
+        </button>
+        <div id="review-body">
+          <!-- Populated by buildReview() when entering step 7 -->
+        </div>
+      </div>
+
+    </div><!-- /steps-wrap -->
+
+    <!-- ============================================================
+         BANNER + NAV BUTTONS
+    ============================================================ -->
+    <div id="form-banner"></div>
+
+    <div class="nav-row">
+      <button type="button" class="btn-back" id="btn-back" disabled>← Back</button>
+      <button type="button" class="btn-next" id="btn-next">Next →</button>
+    </div>
+
+  </form>
+
+  <!-- ============================================================
+       SUCCESS SCREEN
+  ============================================================ -->
+  <div id="success-screen">
+    <div class="success-icon">✓</div>
+    <h2>Form Submitted!</h2>
+    <p>Your job intake has been received.<br>We'll be in touch with you shortly.</p>
+    <button class="btn-restart" onclick="restartForm()">Submit Another</button>
+  </div>
+
+  <!-- ============================================================
+       ELITE CONNECTOR FOOTER
+  ============================================================ -->
+  <footer class="ec-footer">
+    <a href="https://eliteconnector.co.uk/" target="_blank" rel="noopener noreferrer">
+      <img
+        src="https://msgsndr-private.storage.googleapis.com/companyPhotos/cfbf05c1-be22-4cb3-b53c-1eaf24f986fb.png"
+        alt="Elite Connector Ltd"
+        loading="eager"
+        decoding="async"
+        onerror="this.style.display='none';document.querySelector('.ec-logo-fallback-text').style.display='inline-block';"
+      />
+      <span class="ec-logo-fallback-text">Elite Connector Ltd</span>
+    </a>
+    <p class="powered-by-text">Powered by Elite Connector Ltd</p>
+  </footer>
+
+</div><!-- /form-shell -->
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+/* ================================================================
+   STEP DEFINITIONS
+   Edit the label and required field IDs for each step's validation.
+================================================================ */
+const STEPS = [
+  { id: 1, name: "Contact",   requiredIds: ["phone", "email"] },
+  { id: 2, name: "Survey",    requiredIds: ["survey_date","street_address","city","country"] },
+  { id: 3, name: "Parking",   requiredIds: ["parking_arrangement"] },
+  { id: 4, name: "Job Type",  requiredIds: [] },
+  { id: 5, name: "Materials", requiredIds: [] },
+  { id: 6, name: "Notes & Photos", requiredIds: [] },
+  { id: 7, name: "Review",    requiredIds: [] }
+];
+
+const TOTAL_STEPS = STEPS.length;
+let currentStep   = 1;
+
+/* ================================================================
+   JOB CATEGORIES CONFIG
+   Edit to add / remove categories or options.
+================================================================ */
+const JOB_CATEGORIES = {
+  "Survey / Quote": {
+    fieldId: "jt_survey",
+    options: [
+      "Survey / site visit (domestic)",
+      "Survey / site visit (commercial)",
+      "Quotation visit / estimate"
+    ]
+  },
+  "Certification / Inspection": {
+    fieldId: "jt_cert",
+    options: [
+      "EICR (domestic)",
+      "EICR (commercial)",
+      "EIC (new installation)",
+      "Minor works certificate",
+      "Landlord remedials (post-EICR)",
+      "PAT testing"
+    ]
+  },
+  "Faults / Callouts": {
+    fieldId: "jt_faults",
+    options: [
+      "Emergency callout (no power)",
+      "Fault finding (general)",
+      "Tripping RCD/RCBO",
+      "Overheating / burning smell",
+      "Partial power / intermittent fault",
+      "Lighting fault",
+      "Outdoor power fault"
+    ]
+  },
+  "Consumer Unit / Protection": {
+    fieldId: "jt_cu",
+    options: [
+      "Consumer unit replacement (domestic)",
+      "Distribution board works (commercial)",
+      "Add/replace RCBO or protective device",
+      "SPD install/upgrade",
+      "RCD issues / upgrade",
+      "Isolator install (domestic)"
+    ]
+  },
+  "Circuits / Power": {
+    fieldId: "jt_circuits",
+    options: [
+      "New circuit install",
+      "Add socket(s)",
+      "Add fused spur",
+      "Cooker connection / circuit",
+      "Shower connection / circuit",
+      "Outbuilding / garage supply",
+      "Kitchen/utility appliance connection (hardwired)"
+    ]
+  },
+  "Lighting": {
+    fieldId: "jt_lighting",
+    options: [
+      "Replace light fitting(s)",
+      "New lighting points",
+      "Downlights install/replace",
+      "Outdoor/security lighting",
+      "LED upgrade (bulk)",
+      "Emergency lighting install/service"
+    ]
+  },
+  "EV Charging": {
+    fieldId: "jt_ev",
+    options: [
+      "EV charger install",
+      "EV charger fault/repair",
+      "EV charger service/inspection",
+      "Load management / CT clamp / DNO considerations (notes field)"
+    ]
+  },
+  "Safety Systems (alarms/emergency lighting)": {
+    fieldId: "jt_safety",
+    options: [
+      "Smoke/heat alarms (mains/interlinked)",
+      "CO alarm install",
+      "Emergency lighting test/repair (commercial)",
+      "Basic fire alarm works (if in scope)"
+    ]
+  },
+  "Ventilation (fans)": {
+    fieldId: "jt_vent",
+    options: [
+      "Bathroom extractor fan install/replace",
+      "Fan fault repair",
+      "Kitchen extractor wiring"
+    ]
+  },
+  "Data / Security / Access": {
+    fieldId: "jt_data",
+    options: [
+      "Data point (Cat6) install",
+      "Comms cabinet / rack power tidy-up",
+      "CCTV power wiring",
+      "Door access / intercom power wiring",
+      "Wired doorbell install"
+    ]
+  },
+  "Commercial / 3-Phase / Plant": {
+    fieldId: "jt_commercial",
+    options: [
+      "3-phase fault finding",
+      "3-phase circuit install/alteration",
+      "Isolator install (commercial/plant)",
+      "Plant/equipment connection",
+      "Small commercial fit-out works"
+    ]
+  },
+  "Remedials / Follow-on Works": {
+    fieldId: "jt_remedials",
+    options: [
+      "Remedial works (general)",
+      "Return visit / snagging",
+      "Making good / finishing"
+    ]
+  }
+};
+
+/* ================================================================
+   MATERIALS DATABASE
+   Same name + same unit across multiple selections → qty is summed.
+   Edit default quantities here.
+================================================================ */
+const MATERIALS_DB = {
+  "Survey / site visit (domestic)": [
+    { name: "MFT multifunction tester",    qty: 1, unit: "" },
+    { name: "Lock off kit",                qty: 1, unit: "" },
+    { name: "Voltage indicator",           qty: 1, unit: "" },
+    { name: "Temporary warning labels",    qty: 1, unit: "pack" },
+    { name: "Inspection sheets",           qty: 1, unit: "pack" },
+    { name: "PPE",                         qty: 1, unit: "set" }
+  ],
+  "Survey / site visit (commercial)": [
+    { name: "3-phase tester",              qty: 1, unit: "" },
+    { name: "Clamp meter",                 qty: 1, unit: "" },
+    { name: "MFT tester",                  qty: 1, unit: "" },
+    { name: "Lock off kit",                qty: 1, unit: "" },
+    { name: "Warning labels",              qty: 1, unit: "pack" },
+    { name: "PPE",                         qty: 1, unit: "set" }
+  ],
+  "Quotation visit / estimate": [
+    { name: "Measuring tape",              qty: 1, unit: "" },
+    { name: "Laser distance measurer",     qty: 1, unit: "" },
+    { name: "Tablet / paperwork",          qty: 1, unit: "" },
+    { name: "Camera",                      qty: 1, unit: "" },
+    { name: "PPE",                         qty: 1, unit: "set" }
+  ],
+  "EICR (domestic)": [
+    { name: "MFT tester",                  qty: 1, unit: "" },
+    { name: "RCD tester",                  qty: 1, unit: "" },
+    { name: "Lock off kit",                qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" },
+    { name: "Minor fix items (Wagos, screws)", qty: 1, unit: "set" }
+  ],
+  "EICR (commercial)": [
+    { name: "3-phase tester",              qty: 1, unit: "" },
+    { name: "Clamp meter",                 qty: 1, unit: "" },
+    { name: "MFT tester",                  qty: 1, unit: "" },
+    { name: "Warning labels",              qty: 1, unit: "pack" },
+    { name: "Lock off kit",                qty: 1, unit: "" }
+  ],
+  "EIC (new installation)": [
+    { name: "MFT tester",                  qty: 1, unit: "" },
+    { name: "Circuit labels",              qty: 1, unit: "pack" },
+    { name: "SPD label",                   qty: 1, unit: "" },
+    { name: "Test sheets",                 qty: 1, unit: "pack" }
+  ],
+  "Minor works certificate": [
+    { name: "RCBO (if new circuit)",       qty: 1, unit: "" },
+    { name: "2.5mm² T&E",                  qty: 5, unit: "m" },
+    { name: "Socket/switch",               qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 6, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "Landlord remedials (post-EICR)": [
+    { name: "Replacement sockets",         qty: 2, unit: "" },
+    { name: "Replacement switches",        qty: 2, unit: "" },
+    { name: "RCBOs",                       qty: 2, unit: "" },
+    { name: "Back boxes",                  qty: 2, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "PAT testing": [
+    { name: "PAT tester",                  qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" },
+    { name: "Extension leads for testing", qty: 2, unit: "" }
+  ],
+  "Emergency callout (no power)": [
+    { name: "Spare RCBOs (6A/20A/32A)",    qty: 1, unit: "set" },
+    { name: "Spare MCB",                   qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 6, unit: "" },
+    { name: "Junction box",                qty: 1, unit: "" },
+    { name: "Spare socket",                qty: 1, unit: "" }
+  ],
+  "Fault finding (general)": [
+    { name: "MFT tester",                  qty: 1, unit: "" },
+    { name: "Clamp meter",                 qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 6, unit: "" },
+    { name: "Replacement socket/switch",   qty: 1, unit: "" }
+  ],
+  "Tripping RCD/RCBO": [
+    { name: "Replacement RCBO",            qty: 1, unit: "" },
+    { name: "Insulation tape",             qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 3, unit: "" },
+    { name: "Spare socket",                qty: 1, unit: "" }
+  ],
+  "Overheating / burning smell": [
+    { name: "Replacement socket",          qty: 1, unit: "" },
+    { name: "Back box",                    qty: 1, unit: "" },
+    { name: "RCBO",                        qty: 1, unit: "" },
+    { name: "Cable section (2.5mm²)",      qty: 3, unit: "m" }
+  ],
+  "Partial power / intermittent fault": [
+    { name: "Wagos",                       qty: 6, unit: "" },
+    { name: "Replacement MCB",             qty: 1, unit: "" },
+    { name: "Back box",                    qty: 1, unit: "" }
+  ],
+  "Lighting fault": [
+    { name: "Replacement light fitting",   qty: 1, unit: "" },
+    { name: "Connector blocks",            qty: 3, unit: "" },
+    { name: "Wagos",                       qty: 3, unit: "" }
+  ],
+  "Outdoor power fault": [
+    { name: "IP66 socket",                 qty: 1, unit: "" },
+    { name: "2.5mm² T&E",                  qty: 3, unit: "m" },
+    { name: "IP junction box",             qty: 1, unit: "" }
+  ],
+  "Consumer unit replacement (domestic)": [
+    { name: "14 Way Metal CU",             qty: 1, unit: "" },
+    { name: "Type 2 SPD",                  qty: 1, unit: "" },
+    { name: "RCBOs (6A ×2, 20A, 32A ×3, 50A)", qty: 1, unit: "set" },
+    { name: "Meter tails",                 qty: 1, unit: "set" },
+    { name: "Earth & bonding cable",       qty: 1, unit: "set" },
+    { name: "Labels",                      qty: 1, unit: "pack" },
+    { name: "Grommets",                    qty: 1, unit: "pack" }
+  ],
+  "Distribution board works (commercial)": [
+    { name: "3-phase board",               qty: 1, unit: "" },
+    { name: "3-phase MCBs",                qty: 4, unit: "" },
+    { name: "SPD",                         qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "Add/replace RCBO or protective device": [
+    { name: "RCBO (correct rating)",       qty: 1, unit: "" },
+    { name: "Blanking plate",              qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "SPD install/upgrade": [
+    { name: "Type 2 SPD",                  qty: 1, unit: "" },
+    { name: "SPD breaker",                 qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "RCD issues / upgrade": [
+    { name: "Type A RCD",                  qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "Isolator install (domestic)": [
+    { name: "100A isolator",               qty: 1, unit: "" },
+    { name: "Tails",                       qty: 1, unit: "set" },
+    { name: "Fixings",                     qty: 1, unit: "pack" }
+  ],
+  "New circuit install": [
+    { name: "RCBO",                        qty: 1, unit: "" },
+    { name: "Cable (2.5/4/6mm²)",          qty: 10, unit: "m" },
+    { name: "Back box",                    qty: 1, unit: "" },
+    { name: "Outlet plate",                qty: 1, unit: "" }
+  ],
+  "Add socket(s)": [
+    { name: "White double socket",         qty: 1, unit: "" },
+    { name: "2.5mm² T&E",                  qty: 5, unit: "m" },
+    { name: "35mm back box",               qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 3, unit: "" }
+  ],
+  "Add fused spur": [
+    { name: "FCU",                         qty: 1, unit: "" },
+    { name: "2.5mm² cable",                qty: 3, unit: "m" },
+    { name: "Back box",                    qty: 1, unit: "" }
+  ],
+  "Cooker connection / circuit": [
+    { name: "6mm² T&E",                    qty: 10, unit: "m" },
+    { name: "32A/40A RCBO",               qty: 1, unit: "" },
+    { name: "Cooker control unit",         qty: 1, unit: "" }
+  ],
+  "Shower connection / circuit": [
+    { name: "10mm² T&E",                   qty: 8, unit: "m" },
+    { name: "50A RCBO",                    qty: 1, unit: "" },
+    { name: "Shower isolator",             qty: 1, unit: "" }
+  ],
+  "Outbuilding / garage supply": [
+    { name: "SWA cable",                   qty: 15, unit: "m" },
+    { name: "SWA glands",                  qty: 2, unit: "" },
+    { name: "Sub board",                   qty: 1, unit: "" },
+    { name: "Earth rod",                   qty: 1, unit: "" },
+    { name: "RCBOs",                       qty: 3, unit: "" }
+  ],
+  "Kitchen/utility appliance connection (hardwired)": [
+    { name: "2.5mm² T&E",                  qty: 3, unit: "m" },
+    { name: "FCU",                         qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 3, unit: "" }
+  ],
+  "Replace light fitting(s)": [
+    { name: "Light fitting",               qty: 1, unit: "" },
+    { name: "Wagos",                       qty: 3, unit: "" }
+  ],
+  "New lighting points": [
+    { name: "1.0mm² T&E",                  qty: 5, unit: "m" },
+    { name: "Switch",                      qty: 1, unit: "" },
+    { name: "Back box",                    qty: 1, unit: "" }
+  ],
+  "Downlights install/replace": [
+    { name: "Fire-rated downlight",        qty: 1, unit: "" },
+    { name: "1.0mm² T&E",                  qty: 5, unit: "m" },
+    { name: "Wagos",                       qty: 3, unit: "" }
+  ],
+  "Outdoor/security lighting": [
+    { name: "IP65 fitting",                qty: 1, unit: "" },
+    { name: "1.5mm² cable",                qty: 5, unit: "m" },
+    { name: "Junction box",                qty: 1, unit: "" }
+  ],
+  "LED upgrade (bulk)": [
+    { name: "LED lamps",                   qty: 6, unit: "" },
+    { name: "Connectors",                  qty: 3, unit: "" }
+  ],
+  "Emergency lighting install/service": [
+    { name: "Emergency light fitting",     qty: 1, unit: "" },
+    { name: "Test key",                    qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "EV charger install": [
+    { name: "EV charger",                  qty: 1, unit: "" },
+    { name: "40A/50A RCBO",               qty: 1, unit: "" },
+    { name: "6/10mm² cable",              qty: 15, unit: "m" },
+    { name: "CT clamp",                    qty: 1, unit: "" },
+    { name: "SPD",                         qty: 1, unit: "" },
+    { name: "Isolator",                    qty: 1, unit: "" }
+  ],
+  "EV charger fault/repair": [
+    { name: "Replacement RCBO",            qty: 1, unit: "" },
+    { name: "Cable section",               qty: 3, unit: "m" },
+    { name: "Test equipment",              qty: 1, unit: "set" }
+  ],
+  "EV charger service/inspection": [
+    { name: "Test kit",                    qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "Load management / CT clamp / DNO considerations (notes field)": [],
+  "Smoke/heat alarms (mains/interlinked)": [
+    { name: "Mains smoke alarm",           qty: 1, unit: "" },
+    { name: "3C+E cable",                  qty: 5, unit: "m" },
+    { name: "Wagos",                       qty: 3, unit: "" }
+  ],
+  "CO alarm install": [
+    { name: "CO alarm",                    qty: 1, unit: "" },
+    { name: "Fixings",                     qty: 1, unit: "pack" }
+  ],
+  "Emergency lighting test/repair (commercial)": [
+    { name: "Test key",                    qty: 1, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "Basic fire alarm works (if in scope)": [
+    { name: "Alarm head",                  qty: 1, unit: "" },
+    { name: "Base",                        qty: 1, unit: "" },
+    { name: "Cable",                       qty: 10, unit: "m" },
+    { name: "Sounder (if required)",       qty: 1, unit: "" }
+  ],
+  "Bathroom extractor fan install/replace": [
+    { name: "Fan unit",                    qty: 1, unit: "" },
+    { name: "3-pole isolator",             qty: 1, unit: "" },
+    { name: "3C+E cable",                  qty: 3, unit: "m" },
+    { name: "Ducting",                     qty: 1, unit: "set" },
+    { name: "External grille",             qty: 1, unit: "" }
+  ],
+  "Fan fault repair": [
+    { name: "Replacement fan",             qty: 1, unit: "" },
+    { name: "Isolator",                    qty: 1, unit: "" }
+  ],
+  "Kitchen extractor wiring": [
+    { name: "2.5mm² cable",                qty: 3, unit: "m" },
+    { name: "FCU",                         qty: 1, unit: "" }
+  ],
+  "Data point (Cat6) install": [
+    { name: "Cat6 cable",                  qty: 10, unit: "m" },
+    { name: "RJ45 module",                 qty: 1, unit: "" },
+    { name: "Faceplate",                   qty: 1, unit: "" },
+    { name: "Back box",                    qty: 1, unit: "" }
+  ],
+  "Comms cabinet / rack power tidy-up": [
+    { name: "Small rack",                  qty: 1, unit: "" },
+    { name: "Patch panel",                 qty: 1, unit: "" },
+    { name: "Network switch",              qty: 1, unit: "" }
+  ],
+  "CCTV power wiring": [
+    { name: "1.5mm² cable",                qty: 5, unit: "m" },
+    { name: "FCU",                         qty: 1, unit: "" }
+  ],
+  "Door access / intercom power wiring": [
+    { name: "Power cable",                 qty: 5, unit: "m" },
+    { name: "Back box",                    qty: 1, unit: "" },
+    { name: "Isolator",                    qty: 1, unit: "" }
+  ],
+  "Wired doorbell install": [
+    { name: "Bell unit",                   qty: 1, unit: "" },
+    { name: "Transformer",                 qty: 1, unit: "" },
+    { name: "Cable",                       qty: 5, unit: "m" }
+  ],
+  "3-phase fault finding": [
+    { name: "3-phase tester",              qty: 1, unit: "" },
+    { name: "Clamp meter",                 qty: 1, unit: "" }
+  ],
+  "3-phase circuit install/alteration": [
+    { name: "5-core SWA",                  qty: 15, unit: "m" },
+    { name: "3-phase breaker",             qty: 1, unit: "" },
+    { name: "Isolator",                    qty: 1, unit: "" },
+    { name: "Glands",                      qty: 2, unit: "" }
+  ],
+  "Isolator install (commercial/plant)": [
+    { name: "3-phase isolator",            qty: 1, unit: "" },
+    { name: "Fixings",                     qty: 1, unit: "pack" }
+  ],
+  "Plant/equipment connection": [
+    { name: "Correct size cable",          qty: 10, unit: "m" },
+    { name: "Isolator",                    qty: 1, unit: "" },
+    { name: "Glands",                      qty: 2, unit: "" }
+  ],
+  "Small commercial fit-out works": [
+    { name: "Containment",                 qty: 5, unit: "m" },
+    { name: "Sockets",                     qty: 4, unit: "" },
+    { name: "Lighting fittings",           qty: 2, unit: "" },
+    { name: "RCBOs",                       qty: 4, unit: "" }
+  ],
+  "Remedial works (general)": [
+    { name: "Replacement sockets",         qty: 2, unit: "" },
+    { name: "Switches",                    qty: 2, unit: "" },
+    { name: "RCBOs",                       qty: 2, unit: "" },
+    { name: "Labels",                      qty: 1, unit: "pack" }
+  ],
+  "Return visit / snagging": [
+    { name: "Minor fix materials",         qty: 1, unit: "set" },
+    { name: "Wagos",                       qty: 6, unit: "" },
+    { name: "Screws",                      qty: 1, unit: "pack" }
+  ],
+  "Making good / finishing": [
+    { name: "Filler",                      qty: 1, unit: "" },
+    { name: "Faceplates",                  qty: 2, unit: "" },
+    { name: "Fixings",                     qty: 1, unit: "pack" }
+  ]
+};
+
+/* ================================================================
+   GHL WEBHOOK URL
+   Replace with your actual GHL Inbound Webhook URL from:
+   GHL → Automations → Workflows → Trigger: Inbound Webhook
+================================================================ */
+const GHL_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/BINHN67zcmmPlBACGLVK/webhook-trigger/532880a0-4c59-4e84-a64b-0cf9adfe590a"; // ← REPLACE
+
+/* ================================================================
+   BUILD PROGRESS BAR
+================================================================ */
+(function buildProgressBar() {
+  const labelsRow = document.getElementById("step-labels-row");
+  const trackRow  = document.getElementById("step-track-row");
+
+  STEPS.forEach(function(step, idx) {
+    // Label
+    const lbl = document.createElement("div");
+    lbl.className = "step-label" + (idx === 0 ? " active" : "");
+    lbl.id = "lbl-step-" + step.id;
+    lbl.textContent = step.name;
+    labelsRow.appendChild(lbl);
+
+    // Line before dot (except first)
+    if (idx > 0) {
+      const line = document.createElement("div");
+      line.className = "step-line";
+      line.id = "line-" + step.id;
+      const fill = document.createElement("div");
+      fill.className = "fill";
+      line.appendChild(fill);
+      trackRow.appendChild(line);
+    }
+
+    // Dot
+    const dot = document.createElement("div");
+    dot.className = "step-dot" + (idx === 0 ? " active" : "");
+    dot.id = "dot-step-" + step.id;
+    const span = document.createElement("span");
+    span.textContent = step.id;
+    dot.appendChild(span);
+    trackRow.appendChild(dot);
+  });
+})();
+
+/* ================================================================
+   STEP 4 — PAGINATED CATEGORY SUB-SELECTS + INLINE MATERIALS
+================================================================ */
+var msSelected    = [];   // all selected sub-option strings (flat)
+var CAT_KEYS      = Object.keys(JOB_CATEGORIES);  // ordered list of 12 cats
+var currentCatPage = 0;   // 0-indexed index into CAT_KEYS
+
+/* ── Build all category dropdowns, then show first page ── */
+(function initAllSubDropdowns() {
+  CAT_KEYS.forEach(function(cat) {
+    buildSubDropdown(cat);
+  });
+  showCatPage(0);
+
+  document.getElementById("btn-cat-prev").addEventListener("click", function() {
+    if (currentCatPage > 0) showCatPage(currentCatPage - 1);
+  });
+  document.getElementById("btn-cat-next").addEventListener("click", function() {
+    if (currentCatPage < CAT_KEYS.length - 1) showCatPage(currentCatPage + 1);
+  });
+})();
+
+/* ── Show a specific category page ── */
+function showCatPage(idx) {
+  currentCatPage = idx;
+  CAT_KEYS.forEach(function(cat, i) {
+    var pg = document.getElementById("cat-page-" + i);
+    if (pg) pg.classList.toggle("active", i === idx);
+  });
+  document.getElementById("cat-page-name").textContent  = CAT_KEYS[idx];
+  document.getElementById("cat-page-index").textContent = (idx + 1) + " of " + CAT_KEYS.length;
+  document.getElementById("btn-cat-prev").disabled = idx === 0;
+  document.getElementById("btn-cat-next").disabled = idx === CAT_KEYS.length - 1;
+  // Close any open dropdowns when switching page
+  document.querySelectorAll(".ms-wrap.open").forEach(function(w) { w.classList.remove("open"); });
+}
+
+
+/* ================================================================
+   NEW STEP 4 FUNCTIONS (all categories visible + inline materials)
+================================================================ */
+
+/* Create one category section wrapped in a .cat-page div */
+function buildSubDropdown(cat) {
+  var container = document.getElementById("sub-dropdowns-container");
+  if (!container || document.getElementById("sub-fg-" + cat)) return;
+  var cfg   = JOB_CATEGORIES[cat];
+  var pageIdx = CAT_KEYS.indexOf(cat);
+
+  // Outer page wrapper — hidden until showCatPage activates it
+  var page = document.createElement("div");
+  page.className = "cat-page";
+  page.id = "cat-page-" + pageIdx;
+
+  var fg = document.createElement("div");
+  fg.className = "field-group";
+  fg.id = "sub-fg-" + cat;
+  fg.style.marginBottom = "18px";
+
+  var lbl = document.createElement("label");
+  lbl.textContent = cat;
+  fg.appendChild(lbl);
+
+  var wrap = document.createElement("div");
+  wrap.className = "ms-wrap";
+  wrap.id = "sub-wrap-" + cat;
+
+  var trigger = document.createElement("div");
+  trigger.className = "ms-trigger";
+  trigger.id = "sub-trigger-" + cat;
+
+  var ph = document.createElement("span");
+  ph.className   = "ms-placeholder";
+  ph.id          = "sub-ph-" + cat;
+  ph.textContent = "Click to choose\u2026";
+  trigger.appendChild(ph);
+  wrap.appendChild(trigger);
+
+  var dropdown = document.createElement("div");
+  dropdown.className = "ms-dropdown";
+  dropdown.id = "sub-drop-" + cat;
+
+  cfg.options.forEach(function(optText) {
+    var row = document.createElement("div");
+    row.className = "ms-option";
+    row.setAttribute("data-value", optText);
+    var cb   = document.createElement("input");
+    cb.type  = "checkbox"; cb.tabIndex = -1;
+    var span = document.createElement("span");
+    span.textContent = optText;
+    row.appendChild(cb);
+    row.appendChild(span);
+    dropdown.appendChild(row);
+    row.addEventListener("mousedown", function(e) {
+      e.preventDefault();
+      toggleSubOption(cat, optText, row, cb);
+    });
+  });
+
+  wrap.appendChild(dropdown);
+  fg.appendChild(wrap);
+
+  trigger.addEventListener("click", function() {
+    var isOpen = wrap.classList.toggle("open");
+    trigger.classList.toggle("open", isOpen);
+  });
+  document.addEventListener("click", function(e) {
+    if (!wrap.contains(e.target)) {
+      wrap.classList.remove("open");
+      trigger.classList.remove("open");
+    }
+  });
+
+  var matPanel = document.createElement("div");
+  matPanel.className = "cat-mat-panel";
+  matPanel.id = "mat-" + cat;
+  fg.appendChild(matPanel);
+
+  page.appendChild(fg);
+  container.appendChild(page);
+}
+
+/* Toggle a sub-option within a category */
+function toggleSubOption(cat, value, row, cb) {
+  var idx = msSelected.indexOf(value);
+  if (idx === -1) {
+    msSelected.push(value);
+    row.classList.add("selected");
+    cb.checked = true;
+  } else {
+    msSelected.splice(idx, 1);
+    row.classList.remove("selected");
+    cb.checked = false;
+  }
+  renderSubTags(cat);
+  renderCatMaterials(cat);
+  _checkEVNotes();
+}
+
+/* Render pill tags in the dropdown trigger for a category */
+function renderSubTags(cat) {
+  var trigger     = document.getElementById("sub-trigger-" + cat);
+  var placeholder = document.getElementById("sub-ph-" + cat);
+  if (!trigger) return;
+  Array.from(trigger.querySelectorAll(".ms-tag")).forEach(function(t) { t.remove(); });
+  var catOpts  = JOB_CATEGORIES[cat] ? JOB_CATEGORIES[cat].options : [];
+  var selected = msSelected.filter(function(v) { return catOpts.indexOf(v) !== -1; });
+  if (selected.length === 0) {
+    if (placeholder) placeholder.style.display = "";
+    return;
+  }
+  if (placeholder) placeholder.style.display = "none";
+  selected.forEach(function(val) {
+    var tag = document.createElement("span");
+    tag.className = "ms-tag";
+    var txt = document.createTextNode(val + " ");
+    var x   = document.createElement("span");
+    x.className = "ms-tag-x"; x.textContent = "\u00d7";
+    x.addEventListener("click", function(e) {
+      e.stopPropagation();
+      var drop   = document.getElementById("sub-drop-" + cat);
+      var optRow = null;
+      if (drop) drop.querySelectorAll(".ms-option").forEach(function(r) {
+        if (r.getAttribute("data-value") === val) optRow = r;
+      });
+      var optCb = optRow ? optRow.querySelector("input") : null;
+      var i = msSelected.indexOf(val);
+      if (i !== -1) msSelected.splice(i, 1);
+      if (optRow) optRow.classList.remove("selected");
+      if (optCb)  optCb.checked = false;
+      renderSubTags(cat);
+      renderCatMaterials(cat);
+      _checkEVNotes();
+    });
+    tag.appendChild(txt); tag.appendChild(x);
+    trigger.insertBefore(tag, placeholder);
+  });
+}
+
+/* Render materials list inline below a category's dropdown (with editable qty) */
+function renderCatMaterials(cat) {
+  var panel = document.getElementById("mat-" + cat);
+  if (!panel) return;
+
+  // Snapshot existing qty values so we can restore them after redraw
+  var savedQtys = {};
+  panel.querySelectorAll(".mat-qty-inp").forEach(function(inp) {
+    savedQtys[inp.getAttribute("data-key")] = inp.value;
+  });
+
+  var catOpts  = JOB_CATEGORIES[cat] ? JOB_CATEGORIES[cat].options : [];
+  var selected = msSelected.filter(function(v) { return catOpts.indexOf(v) !== -1; });
+  if (selected.length === 0) {
+    panel.innerHTML = ""; panel.classList.remove("visible"); return;
+  }
+
+  panel.innerHTML = "";
+  var anyRendered = false;
+
+  selected.forEach(function(opt) {
+    var mats = (MATERIALS_DB[opt] || []).filter(function(m) { return m.name; });
+    if (!mats.length) return;
+    anyRendered = true;
+
+    var group = document.createElement("div");
+    group.className = "mat-group";
+
+    var lbl = document.createElement("div");
+    lbl.className = "mat-opt-label";
+    lbl.textContent = opt;
+    group.appendChild(lbl);
+
+    var ul = document.createElement("ul");
+    mats.forEach(function(m) {
+      var key = opt + "||" + m.name;
+      var li  = document.createElement("li");
+
+      var inp = document.createElement("input");
+      inp.type      = "number";
+      inp.min       = "0";
+      inp.step      = "1";
+      inp.className = "mat-qty-inp";
+      inp.setAttribute("data-key",  key);
+      inp.setAttribute("data-mat",  m.name);
+      inp.setAttribute("data-unit", m.unit || "");
+      inp.value = (savedQtys[key] !== undefined) ? savedQtys[key] : m.qty;
+
+      var name = document.createElement("span");
+      name.textContent = m.name;
+
+      li.appendChild(inp);
+      if (m.unit) {
+        var badge = document.createElement("span");
+        badge.className   = "mat-unit-badge";
+        badge.textContent = m.unit;
+        li.appendChild(badge);
+      }
+      li.appendChild(name);
+      ul.appendChild(li);
+    });
+    group.appendChild(ul);
+    panel.appendChild(group);
+  });
+
+  if (anyRendered) { panel.classList.add("visible"); }
+  else             { panel.innerHTML = ""; panel.classList.remove("visible"); }
+}
+
+/* Show / hide EV notes textarea */
+function _checkEVNotes() {
+  var evOpts = JOB_CATEGORIES["EV Charging"] ? JOB_CATEGORIES["EV Charging"].options : [];
+  var anyEV  = msSelected.some(function(v) { return evOpts.indexOf(v) !== -1; });
+  document.getElementById("ev-notes-block").classList.toggle("visible", anyEV);
+  if (!anyEV) document.getElementById("ev_notes").value = "";
+}
+
+/* ================================================================
+   BUILD REVIEW PANEL (Step 7)
+================================================================ */
+function buildReview() {
+  var body = document.getElementById("review-body");
+  if (!body) return;
+  body.innerHTML = "";
+
+  // ── helper: create a section card
+  function section(title) {
+    var sec = document.createElement("div");
+    sec.className = "review-section";
+    var hdr = document.createElement("div");
+    hdr.className = "review-section-title";
+    hdr.textContent = title;
+    sec.appendChild(hdr);
+    var grid = document.createElement("div");
+    grid.className = "review-grid";
+    sec.appendChild(grid);
+    body.appendChild(sec);
+    return grid;
+  }
+
+  function cell(grid, label, value, fullRow) {
+    var c = document.createElement("div");
+    c.className = "review-cell" + (fullRow ? " review-full-row" : "");
+    var lb = document.createElement("div");
+    lb.className = "review-cell-label";
+    lb.textContent = label;
+    var vl = document.createElement("div");
+    vl.className = "review-cell-value";
+    if (typeof value === "string" || typeof value === "number") {
+      vl.textContent = value || "—";
+    } else {
+      vl.appendChild(value); // DOM node
+    }
+    c.appendChild(lb); c.appendChild(vl);
+    grid.appendChild(c);
+  }
+
+  function tagList(items) {
+    var div = document.createElement("div");
+    div.className = "review-tag-list";
+    if (!items || items.length === 0) { div.textContent = "—"; return div; }
+    items.forEach(function(t) {
+      var s = document.createElement("span");
+      s.className = "review-tag";
+      s.textContent = t;
+      div.appendChild(s);
+    });
+    return div;
+  }
+
+  // ── 1. Contact
+  var g1 = section("Contact Details");
+  var fname = document.getElementById("first_name").value.trim();
+  var lname = document.getElementById("last_name").value.trim();
+  cell(g1, "Name", (fname + " " + lname).trim() || "—");
+  cell(g1, "Phone", "+44 " + (document.getElementById("phone").value.trim() || "—"));
+  cell(g1, "Email", document.getElementById("email").value.trim() || "—", true);
+
+  // ── 2. Survey Details
+  var g2 = section("Survey Details");
+  cell(g2, "Survey Date", document.getElementById("survey_date").value || "—");
+  cell(g2, "Parking", document.getElementById("parking_arrangement").value || "—");
+  var street  = document.getElementById("street_address").value.trim();
+  var city    = document.getElementById("city").value.trim();
+  var country = document.getElementById("country").value;
+  cell(g2, "Address", [street, city, country].filter(Boolean).join(", ") || "—", true);
+
+  // ── 3. Job Types
+  var g3 = section("Job Types Selected");
+  var cats = getCheckedCategories();
+  if (cats.length === 0) {
+    cell(g3, "Categories", "No job types selected", true);
+  } else {
+    cats.forEach(function(cat) {
+      var opts = getCheckedOptions(cat);
+      cell(g3, cat, tagList(opts), true);
+    });
+  }
+
+  // ── 4. Materials
+  var matSec = document.createElement("div");
+  matSec.className = "review-section";
+  var matHdr = document.createElement("div");
+  matHdr.className = "review-section-title";
+  matHdr.textContent = "Materials Required";
+  matSec.appendChild(matHdr);
+
+  // Collect rows from Step 5 qty-input table
+  var matRows = [];
+  document.querySelectorAll(".qty-input").forEach(function(inp) {
+    var qty = parseFloat(inp.value) || 0;
+    if (qty > 0) matRows.push({ name: inp.getAttribute("data-material"), qty: qty, unit: inp.getAttribute("data-unit") || "" });
+  });
+
+  if (matRows.length === 0) {
+    var noMat = document.createElement("p");
+    noMat.style.cssText = "padding:10px 14px;font-size:0.82rem;color:rgba(255,255,255,0.45);";
+    noMat.textContent = "No materials listed.";
+    matSec.appendChild(noMat);
+  } else {
+    var tbl = document.createElement("table");
+    tbl.className = "review-mat-table";
+    var thead = document.createElement("thead");
+    thead.innerHTML = "<tr><th>Material</th><th>Qty</th><th>Unit</th></tr>";
+    var tbody = document.createElement("tbody");
+    matRows.forEach(function(r) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + r.name + "</td><td>" + r.qty + "</td><td>" + (r.unit || "") + "</td>";
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(thead); tbl.appendChild(tbody);
+    var matWrap = document.createElement("div");
+    matWrap.style.padding = "10px 14px";
+    matWrap.appendChild(tbl);
+    matSec.appendChild(matWrap);
+  }
+  body.appendChild(matSec);
+
+  // ── 5. EV Notes + Job Notes
+  var evNotes  = document.getElementById("ev_notes").value.trim();
+  var jobNotes = document.getElementById("job_notes").value.trim();
+  if (evNotes || jobNotes) {
+    var g5 = section("Notes");
+    if (jobNotes) cell(g5, "Job Notes", jobNotes, true);
+    if (evNotes)  cell(g5, "EV / Load Management Notes", evNotes, true);
+  }
+
+  // ── 6. Submission timestamp
+  var g6 = section("Submission Info");
+  var _ts; try { _ts = new Date().toLocaleString("en-GB", { dateStyle: "long", timeStyle: "short" }); } catch(e) { _ts = new Date().toLocaleString("en-GB"); }
+  cell(g6, "Submitted At", _ts);
+  cell(g6, "Form", "Mashworth Services — Job Intake Form");
+}
+
+/* ================================================================
+   UPDATE PROGRESS BAR UI
+================================================================ */
+function updateProgress(step) {
+  STEPS.forEach(function(s, idx) {
+    const dot = document.getElementById("dot-step-" + s.id);
+    const lbl = document.getElementById("lbl-step-" + s.id);
+
+    dot.classList.remove("active", "done");
+    lbl.classList.remove("active", "done");
+
+    if (s.id < step)       { dot.classList.add("done");   lbl.classList.add("done");   }
+    else if (s.id === step) { dot.classList.add("active"); lbl.classList.add("active"); }
+
+    // Fill line between prev dot and this dot
+    const line = document.getElementById("line-" + s.id);
+    if (line) {
+      const fill = line.querySelector(".fill");
+      fill.style.width = s.id <= step ? "100%" : "0%";
+    }
+  });
+
+  // Counter text
+  document.getElementById("sc-current").textContent = "Step " + step;
+  document.getElementById("sc-total").textContent   = "of " + TOTAL_STEPS;
+  document.getElementById("sc-name").textContent    = STEPS[step - 1].name;
+}
+
+/* ================================================================
+   VALIDATION PER STEP
+================================================================ */
+function validateStep(step) {
+  const stepDef = STEPS.find(function(s) { return s.id === step; });
+  if (!stepDef || stepDef.requiredIds.length === 0) return true;
+
+  let ok = true;
+  stepDef.requiredIds.forEach(function(id) {
+    const el  = document.getElementById(id);
+    const err = document.getElementById(id + "-err");
+    if (!el) return;
+
+    const val = el.value.trim ? el.value.trim() : el.value;
+    let fieldOk = Boolean(val);
+
+    // Extra format checks
+    if (id === "phone"  && val) fieldOk = /^[\d\s\-().]{6,}$/.test(val); // UK number without country code
+    if (id === "email"  && val) fieldOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+    if (!fieldOk) {
+      el.classList.add("error");
+      if (err) { err.classList.add("visible"); }
+      ok = false;
+    } else {
+      el.classList.remove("error");
+      if (err) { err.classList.remove("visible"); }
+    }
+  });
+  return ok;
+}
+
+/* ================================================================
+   NAVIGATE TO STEP
+================================================================ */
+function goToStep(target) {
+  // Hide current panel
+  document.getElementById("step-" + currentStep).classList.remove("active");
+
+  // If entering step 5 (Materials), rebuild the table
+  if (target === 5) rebuildMaterials();
+  // If entering step 7 (Review), build the review panel
+  if (target === 7) buildReview();
+
+  // Show target panel
+  currentStep = target;
+  document.getElementById("step-" + currentStep).classList.add("active");
+
+  updateProgress(currentStep);
+
+  // Back button state
+  document.getElementById("btn-back").disabled = (currentStep === 1);
+
+  // Next button label
+  const btnNext = document.getElementById("btn-next");
+  btnNext.textContent = (currentStep === TOTAL_STEPS) ? "Submit Form ✓" : "Next →";
+
+  // Hide any banner
+  hideBanner();
+
+  // Scroll to top of form
+  document.querySelector(".form-shell").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ================================================================
+   NEXT BUTTON
+================================================================ */
+document.getElementById("btn-next").addEventListener("click", function() {
+  if (!validateStep(currentStep)) {
+    showBanner("error-banner", "⚠ Please complete the required fields before continuing.");
+    const firstErr = document.querySelector("#step-" + currentStep + " .error");
+    if (firstErr) firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  if (currentStep === TOTAL_STEPS) {
+    submitForm();
+  } else {
+    goToStep(currentStep + 1);
+  }
+});
+
+/* ================================================================
+   BACK BUTTON
+================================================================ */
+document.getElementById("btn-back").addEventListener("click", function() {
+  if (currentStep > 1) goToStep(currentStep - 1);
+});
+
+/* ================================================================
+   HELPERS
+================================================================ */
+function getCheckedOptions(catName) {
+  var cfg = JOB_CATEGORIES[catName];
+  if (!cfg) return [];
+  return msSelected.filter(function(v) { return cfg.options.indexOf(v) !== -1; });
+}
+
+function getAllCheckedOptions() { return msSelected.slice(); }
+
+function getCheckedCategories() {
+  var cats = [];
+  Object.keys(JOB_CATEGORIES).forEach(function(cat) {
+    if (getCheckedOptions(cat).length > 0) cats.push(cat);
+  });
+  return cats;
+}
+
+/* ================================================================
+   REBUILD MATERIALS TABLE (called when entering step 5)
+   Reads qty values from the inline inputs in Step 4, falling back
+   to MATERIALS_DB defaults when no inline input is present.
+================================================================ */
+function rebuildMaterials() {
+  const checked = getAllCheckedOptions();
+
+  // Collect all inline qty inputs from Step 4 mat panels
+  const inlineQtys = {};
+  document.querySelectorAll(".mat-qty-inp").forEach(function(inp) {
+    inlineQtys[inp.getAttribute("data-key")] = parseFloat(inp.value) || 0;
+  });
+
+  // Merge: "name||unit" → { name, qty, unit }
+  const merged = {};
+  checked.forEach(function(optName) {
+    (MATERIALS_DB[optName] || []).forEach(function(mat) {
+      const inlineKey = optName + "||" + mat.name;
+      const qty = (inlineQtys[inlineKey] !== undefined) ? inlineQtys[inlineKey] : mat.qty;
+      if (qty <= 0) return;   // skip if zeroed out
+      const key = mat.name.toLowerCase().trim() + "||" + mat.unit;
+      if (merged[key]) { merged[key].qty += qty; }
+      else             { merged[key] = { name: mat.name, qty: qty, unit: mat.unit }; }
+    });
+  });
+
+  const rows  = Object.values(merged);
+  const noMsg = document.getElementById("no-materials-msg");
+  const table = document.getElementById("material-table");
+  const tbody = document.getElementById("material-tbody");
+
+  tbody.innerHTML = "";
+
+  if (rows.length === 0) {
+    noMsg.style.display  = "block";
+    table.style.display  = "none";
+    return;
+  }
+
+  noMsg.style.display = "none";
+  table.style.display = "table";
+
+  rows.forEach(function(mat) {
+    const tr     = document.createElement("tr");
+    const tdName = document.createElement("td");
+    tdName.textContent = mat.name;
+
+    const tdQty = document.createElement("td");
+    tdQty.style.textAlign = "center";
+
+    const inp = document.createElement("input");
+    inp.type  = "number"; inp.min = "0"; inp.step = "1";
+    inp.value = mat.qty;
+    inp.className = "qty-input";
+    inp.setAttribute("data-material", mat.name);
+    inp.setAttribute("data-unit",     mat.unit);
+
+    tdQty.appendChild(inp);
+    if (mat.unit) {
+      const badge = document.createElement("span");
+      badge.className = "unit-badge";
+      badge.textContent = mat.unit;
+      tdQty.appendChild(badge);
+    }
+
+    tr.appendChild(tdName); tr.appendChild(tdQty);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================================================================
+   COLLECT PAYLOAD
+================================================================ */
+function collectPayload() {
+  const categories  = getCheckedCategories();
+  const allOptions  = getAllCheckedOptions();
+  const street      = document.getElementById("street_address").value.trim();
+  const city        = document.getElementById("city").value.trim();
+  const country     = document.getElementById("country").value;
+
+  // Collect edited material qtys
+  const materials = Array.from(document.querySelectorAll(".qty-input")).map(function(inp) {
+    return { material: inp.getAttribute("data-material"), qty: parseFloat(inp.value) || 0, unit: inp.getAttribute("data-unit") || "" };
+  });
+
+  const rawPhone = document.getElementById("phone").value.trim();
+  const fullPhone = rawPhone ? "+44 " + rawPhone : "";
+
+  return {
+    firstName          : document.getElementById("first_name").value.trim(),
+    lastName           : document.getElementById("last_name").value.trim(),
+    phone              : fullPhone,
+    email              : document.getElementById("email").value.trim(),
+    survey_date        : document.getElementById("survey_date").value,
+    street_address     : street,
+    city               : city,
+    country            : country,
+    full_address       : [street, city, country].filter(Boolean).join(", "),
+    parking_arrangement: document.getElementById("parking_arrangement").value,
+    job_categories     : categories,
+    job_categories_str : categories.join("; "),
+    job_types          : allOptions,
+    job_types_str      : allOptions.join("; "),
+    materials          : materials,
+    ev_notes           : document.getElementById("ev_notes").value.trim(),
+    job_notes          : document.getElementById("job_notes").value.trim(),
+    form_source        : "Mashworth Services — Job Intake Form",
+    submitted_at       : new Date().toISOString()
+  };
+}
+
+/* ================================================================
+   SUBMIT
+================================================================ */
+async function submitForm() {
+  const payload = collectPayload();
+  const btn     = document.getElementById("btn-next");
+  btn.disabled  = true;
+  btn.textContent = "Submitting…";
+
+  try {
+    if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.includes("YOUR_GHL")) {
+      console.log("=== PAYLOAD [Dev Mode — set GHL_WEBHOOK_URL to go live] ===");
+      console.log(JSON.stringify(payload, null, 2));
+      showSuccessScreen();
+      return;
+    }
+    const res = await fetch(GHL_WEBHOOK_URL, {
+      method : "POST",
+      headers: { "Content-Type": "application/json" },
+      body   : JSON.stringify(payload)
+    });
+    if (res.ok) {
+      showSuccessScreen();
+    } else {
+      throw new Error("Server responded with " + res.status);
+    }
+  } catch (err) {
+    console.error(err);
+    showBanner("error-banner", "❌ Submission failed — please try again. (" + err.message + ")");
+    btn.disabled    = false;
+    btn.textContent = "Submit Form ✓";
+  }
+}
+
+function showSuccessScreen() {
+  document.getElementById("survey-form").style.display    = "none";
+  document.getElementById("step-progress").style.display  = "none";
+  document.getElementById("step-counter").style.display   = "none";
+  document.getElementById("success-screen").style.display = "block";
+}
+
+function restartForm() {
+  document.getElementById("survey-form").reset();
+  // Reset all sub-option selections
+  msSelected = [];
+  Object.keys(JOB_CATEGORIES).forEach(function(cat) {
+    var drop = document.getElementById("sub-drop-" + cat);
+    if (drop) drop.querySelectorAll(".ms-option").forEach(function(r) {
+      r.classList.remove("selected");
+      var cb = r.querySelector("input"); if (cb) cb.checked = false;
+    });
+    renderSubTags(cat);
+    renderCatMaterials(cat);
+  });
+  showCatPage(0);
+  document.getElementById("ev-notes-block").classList.remove("visible");
+  if (surveyDatePicker) surveyDatePicker.clear();
+  document.getElementById("btn-next").disabled    = false;
+  document.getElementById("btn-next").textContent = "Next →";
+  document.getElementById("survey-form").style.display    = "";
+  document.getElementById("step-progress").style.display  = "";
+  document.getElementById("step-counter").style.display   = "";
+  document.getElementById("success-screen").style.display = "none";
+  currentStep = 1;
+  document.querySelectorAll(".step-panel").forEach(function(p) { p.classList.remove("active"); });
+  document.getElementById("step-1").classList.add("active");
+  updateProgress(1);
+  document.getElementById("btn-back").disabled = true;
+}
+
+/* ================================================================
+   BANNER HELPERS
+================================================================ */
+function showBanner(type, msg) {
+  const b = document.getElementById("form-banner");
+  b.className = type; b.textContent = msg; b.style.display = "block";
+}
+function hideBanner() {
+  const b = document.getElementById("form-banner");
+  b.style.display = "none";
+}
+
+/* ================================================================
+   INIT FLATPICKR DATE PICKER
+================================================================ */
+var surveyDatePicker = (typeof flatpickr === "function")
+  ? flatpickr("#survey_date", {
+      dateFormat   : "d M Y",
+      minDate      : "today",
+      disableMobile: true,
+      allowInput   : false
+    })
+  : null;
+
+/* Live-clear errors on input */
+["phone","email","survey_date","street_address","city","country","parking_arrangement"].forEach(function(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  ["input","change"].forEach(function(ev) {
+    el.addEventListener(ev, function() {
+      el.classList.remove("error");
+      const err = document.getElementById(id + "-err");
+      if (err) err.classList.remove("visible");
+    });
+  });
+});
+
+/* Init progress bar */
+updateProgress(1);
+</script>
+</body>
+</html>
